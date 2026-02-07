@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="popup-page">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>智能书签整理器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="popup-page">
+  <div class="popup-container">
+    <!-- 头部：动态显示标题和返回按钮 -->
+    <header class="popup-header" id="popupHeader">
+      <h1>智能书签整理器</h1>
+      <button id="openSettings" class="icon-btn" title="设置">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <!-- 主视图：首页 -->
+    <div id="homeView">
+      <section class="stats-section">
+        <h2>书签统计</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-value" id="totalBookmarks">-</span>
+            <span class="stat-label">总书签数</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="uniqueDomains">-</span>
+            <span class="stat-label">不同域名</span>
+          </div>
+        </div>
+        <div class="top-domains" id="topDomains"></div>
+      </section>
+
+      <section class="search-section">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="搜索书签标题或 URL..." autocomplete="off">
+          <button id="clearSearch" class="clear-search-btn" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="search-results" id="searchResults" style="display: none;"></div>
+      </section>
+
+      <section class="action-section">
+        <button id="startOrganize" class="btn btn-primary btn-large">
+          <span class="btn-text">开始整理</span>
+        </button>
+      </section>
+
+      <section class="progress-section" id="progressSection" style="display: none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="progress-text" id="progressText">正在分析书签...</p>
+      </section>
+
+      <section class="preview-section" id="previewSection" style="display: none;">
+        <h2>整理预览</h2>
+        <div class="preview_content" id="previewContent"></div>
+        <div class="preview-actions">
+          <button id="applyChanges" class="btn btn-primary">应用更改</button>
+          <button id="cancelChanges" class="btn btn-secondary">取消</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- 设置视图 -->
+    <div id="settingsView" style="display: none;">
+      <form id="configForm" class="config-form">
+        <section class="form-section">
+          <h2>API 配置</h2>
+
+          <div class="form-group">
+            <label for="apiProvider">API 提供商</label>
+            <select id="apiProvider" name="apiProvider" required>
+              <option value="openai">OpenAI</option>
+              <option value="claude">Anthropic Claude</option>
+              <option value="qwen">阿里通义千问</option>
+              <option value="kimi">月之暗面 Kimi</option>
+              <option value="chatglm">智谱 ChatGLM</option>
+              <option value="deepseek">DeepSeek</option>
+              <option value="openrouter">OpenRouter (聚合)</option>
+            </select>
+            <p class="help-text">选择您要使用的 AI 服务提供商</p>
+          </div>
+
+          <div class="form-group">
+            <label for="endpoint">API Endpoint (可选)</label>
+            <input type="url" id="endpoint" name="endpoint" placeholder="使用默认端点">
+            <p class="help-text">自定义 API 端点，留空使用默认</p>
+          </div>
+
+          <div class="form-group">
+            <label for="apiKey">API Key</label>
+            <div class="input-with-button">
+              <input type="password" id="apiKey" name="apiKey" placeholder="sk-..." required>
+              <button type="button" id="toggleKey" class="toggle-btn">显示</button>
+            </div>
+            <p class="help-text">您的 API 密钥将被安全存储在本地</p>
+          </div>
+
+          <div class="form-group">
+            <label for="model">模型</label>
+            <select id="model" name="model" required>
+              <optgroup label="OpenAI" data-provider="openai">
+                <option value="gpt-4o">GPT-4o</option>
+                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                <option value="gpt-4">GPT-4</option>
+                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+              </optgroup>
+              <optgroup label="Claude" data-provider="claude">
+                <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+                <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+                <option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option>
+                <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+              </optgroup>
+              <optgroup label="通义千问" data-provider="qwen">
+                <option value="qwen-max">Qwen Max</option>
+                <option value="qwen-plus">Qwen Plus</option>
+                <option value="qwen-turbo">Qwen Turbo</option>
+                <option value="qwen-long">Qwen Long</option>
+              </optgroup>
+              <optgroup label="Kimi (K2 系列)" data-provider="kimi">
+                <option value="kimi-k2-0711-preview">Kimi K2 (推荐)</option>
+                <option value="kimi-k2.5">Kimi K2.5</option>
+                <option value="kimi-k1.5">Kimi K1.5</option>
+                <option value="kimi-k1">Kimi K1</option>
+              </optgroup>
+              <optgroup label="ChatGLM" data-provider="chatglm">
+                <option value="glm-4">GLM-4</option>
+                <option value="glm-4v">GLM-4V</option>
+                <option value="glm-3-turbo">GLM-3-Turbo</option>
+              </optgroup>
+              <optgroup label="DeepSeek" data-provider="deepseek">
+                <option value="deepseek-chat">DeepSeek Chat</option>
+                <option value="deepseek-coder">DeepSeek Coder</option>
+              </optgroup>
+              <optgroup label="OpenRouter" data-provider="openrouter">
+                <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
+                <option value="openai/gpt-4o">GPT-4o</option>
+                <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
+                <option value="meta-llama/llama-3.1-70b">Llama 3.1 70B</option>
+              </optgroup>
+            </select>
+            <p class="help-text">选择要使用的 AI 模型</p>
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">保存设置</button>
+          <button type="button" id="testConnection" class="btn btn-secondary">测试连接</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="message" class="message" style="display: none;"></div>
+  </div>
+
+  <script src="api-handler.js"></script>
+  <script src="bookmark-manager.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
